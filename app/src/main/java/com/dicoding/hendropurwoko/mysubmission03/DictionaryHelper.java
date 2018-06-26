@@ -1,6 +1,5 @@
 package com.dicoding.hendropurwoko.mysubmission03;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -63,7 +62,7 @@ public class DictionaryHelper {
 
         String TABLE = isEng ? ENGLISH : INDONESIA;
         ArrayList<DictionaryModel> arrayList = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE + " WHERE " + DatabaseHelper.FIELD_WORD + " LIKE '%" + search + "%'", null);
+        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE + " WHERE " + DatabaseHelper.FIELD_WORD + " LIKE '%" + search + "'", null);
 
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
