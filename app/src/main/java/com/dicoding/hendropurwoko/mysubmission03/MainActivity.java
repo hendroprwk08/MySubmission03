@@ -16,26 +16,31 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
     DictionaryHelper dictionaryHelper;
-
     public ArrayList<DictionaryModel> dictionaryList;
     public ProgressDialog progressDialog;
+
+    AppPreference appPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new LoadData().execute();
+        appPreference = new AppPreference(MainActivity.this);
+        dictionaryHelper = new DictionaryHelper(MainActivity.this);
+        if(appPreference.getFirstRun()) {
+            new LoadData().execute();
+        }else{
+            startActivity(new Intent(MainActivity.this, DictionaryActivity.class));
+        }
+
     }
 
     private class LoadData extends AsyncTask<Void, Void, Void>{
-        AppPreference appPreference;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dictionaryHelper = new DictionaryHelper(MainActivity.this);
-            appPreference = new AppPreference(MainActivity.this);
 
             progressDialog = new ProgressDialog(MainActivity.this);
             progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity{
 
         @Override
         protected Void doInBackground(Void... voids) {
+
             ArrayList<DictionaryModel> engList = loadRaw(R.raw.english_indonesia);
             ArrayList<DictionaryModel> inaList = loadRaw(R.raw.indonesia_english);
 
@@ -75,7 +81,8 @@ public class MainActivity extends AppCompatActivity{
             dictionaryHelper.endTransaction();
             dictionaryHelper.close();
 
-            //appPreference.setFirstRun(false);
+            appPreference.setFirstRun(false);
+
             return null;
         }
     }
