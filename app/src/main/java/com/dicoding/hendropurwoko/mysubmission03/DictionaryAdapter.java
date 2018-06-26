@@ -29,8 +29,8 @@ public class DictionaryAdapter extends RecyclerView.Adapter<DictionaryAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        //Log.d ("hasil word: ", dictionaryModels.get(position).getWord());
-        //Log.d ("hasil description:", dictionaryModels.get(position).getDescription());
+        Log.d("hasil word: ", dictionaryModels.get(position).getWord());
+        Log.d("hasil description:", dictionaryModels.get(position).getDescription());
 
         holder.tvWord.setText(dictionaryModels.get(position).getWord());
         holder.tvDescription.setText(dictionaryModels.get(position).getDescription());

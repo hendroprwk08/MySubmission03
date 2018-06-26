@@ -4,17 +4,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -29,7 +29,7 @@ public class DictionaryActivity extends AppCompatActivity
     DictionaryAdapter dictionaryAdapter;
     DictionaryHelper dictionaryHelper;
 
-    public ArrayList<DictionaryModel> list = new ArrayList<>();
+    public ArrayList<DictionaryModel> dictionaryModels = new ArrayList<>();
 
     EditText edtSearch;
     String word;
@@ -41,6 +41,8 @@ public class DictionaryActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dictionary);
+
+        context = getApplicationContext();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -77,16 +79,8 @@ public class DictionaryActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-                word = edtSearch.getText().toString().trim();
-                dictionaryHelper = new DictionaryHelper(context);
-                dictionaryHelper.open();
-                ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.getWord(word,true);
-                dictionaryHelper.close();
-
-                dictionaryAdapter.addItem(dictionaryModels);
-                dictionaryAdapter.getListData();
-                rvList.setAdapter(dictionaryAdapter);
-
+                word = s.toString().trim();
+                new LoadDictionary().execute(word);
             }
         });
 
@@ -109,21 +103,23 @@ public class DictionaryActivity extends AppCompatActivity
         */
     }
 
-    /*
-    private class LoadDictionary extends AsyncTask<String, Void, Void> {
+    private void displayRecyclerView() {
+
+    }
+
+    private class LoadDictionary extends AsyncTask<String, Void, ArrayList<DictionaryModel>> {
 
         @Override
-        protected Void doInBackground(String... strings) {
-            //new LoadDictionary(strings[0]).execute();
-
-            ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.getWord(strings[0],true);
+        protected ArrayList<DictionaryModel> doInBackground(String... strings) {
+            DictionaryHelper dictionaryHelper = new DictionaryHelper(context);
+            dictionaryHelper.open();
+            ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.getWord(word, true);
             dictionaryHelper.close();
 
             dictionaryAdapter.addItem(dictionaryModels);
             dictionaryAdapter.getListData();
             rvList.setAdapter(dictionaryAdapter);
-
-            return null;
+            return dictionaryModels;
         }
 
         @Override
@@ -137,39 +133,15 @@ public class DictionaryActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(ArrayList<DictionaryModel> aVoid) {
             super.onPostExecute(aVoid);
 
             if (progressDialog.isShowing())
                 progressDialog.dismiss();
+
+            displayRecyclerView();
         }
     }
-    */
-    /*
-    private void getRecyclerViewData(String find, Boolean isEng) {
-        dictionaryHelper = new DictionaryHelper(this);
-        dictionaryHelper.open();
-        try {
-            if (isEng) {
-                if (find.isEmpty()){
-                    list = dictionaryHelper.query(true);
-                }else{
-                    list = dictionaryHelper.query(true);
-                }
-            } else {
-                if (find.isEmpty()){
-                    list = dictionaryHelper.query(false);
-                }else{
-                    list = dictionaryHelper.query(false);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        dictionaryHelper.close();
-        dictionaryAdapter.addItem(list);
-    }
-   */
 
     @Override
     public void onBackPressed() {
