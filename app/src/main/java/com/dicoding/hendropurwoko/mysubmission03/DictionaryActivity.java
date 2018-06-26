@@ -80,8 +80,9 @@ public class DictionaryActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 if (TextUtils.isEmpty(s.toString().trim())) {
+                    dictionaryAdapter.clear();
+                    rvList.setAdapter(dictionaryAdapter);
                     Toast.makeText(DictionaryActivity.this, "Tak ada pencarian", Toast.LENGTH_SHORT).show();
                 } else {
                     word = s.toString().trim();
@@ -137,12 +138,12 @@ public class DictionaryActivity extends AppCompatActivity
         protected void onPostExecute(ArrayList<DictionaryModel> aVoid) {
             super.onPostExecute(aVoid);
 
-            if (progressDialog.isShowing())
-                progressDialog.dismiss();
-
             dictionaryAdapter.addItem(dictionaryModels);
             dictionaryAdapter.getListData();
             rvList.setAdapter(dictionaryAdapter);
+
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
         }
     }
 
