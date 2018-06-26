@@ -28,6 +28,7 @@ public class DictionaryActivity extends AppCompatActivity
     RecyclerView rvList;
     DictionaryAdapter dictionaryAdapter;
     DictionaryHelper dictionaryHelper;
+    ProgressDialog progressDialog;
 
     public ArrayList<DictionaryModel> dictionaryModels = new ArrayList<>();
 
@@ -101,22 +102,17 @@ public class DictionaryActivity extends AppCompatActivity
         */
     }
 
-    private void displayRecyclerView() {
-    }
-
     private class LoadDictionary extends AsyncTask<String, Void, ArrayList<DictionaryModel>> {
+        ArrayList<DictionaryModel> dictionaryModels = new ArrayList<>();
         ProgressDialog progressDialog;
 
         @Override
         protected ArrayList<DictionaryModel> doInBackground(String... strings) {
             DictionaryHelper dictionaryHelper = new DictionaryHelper(context);
             dictionaryHelper.open();
-            ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.getWord(strings[0], true);
+            dictionaryModels = dictionaryHelper.getWord(strings[0], true);
             dictionaryHelper.close();
 
-            dictionaryAdapter.addItem(dictionaryModels);
-            dictionaryAdapter.getListData();
-            rvList.setAdapter(dictionaryAdapter);
             return dictionaryModels;
         }
 
@@ -124,20 +120,22 @@ public class DictionaryActivity extends AppCompatActivity
         protected void onPreExecute() {
             super.onPreExecute();
 
-            /* progressDialog = new ProgressDialog(context);
+            progressDialog = new ProgressDialog(getApplicationContext());
             progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
             progressDialog.setCancelable(true);
-            progressDialog.show();*/
+            progressDialog.show();
         }
 
         @Override
         protected void onPostExecute(ArrayList<DictionaryModel> aVoid) {
             super.onPostExecute(aVoid);
 
-            /* if (progressDialog.isShowing())
-                progressDialog.dismiss(); */
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
 
-            displayRecyclerView();
+            dictionaryAdapter.addItem(dictionaryModels);
+            dictionaryAdapter.getListData();
+            rvList.setAdapter(dictionaryAdapter);
         }
     }
 
