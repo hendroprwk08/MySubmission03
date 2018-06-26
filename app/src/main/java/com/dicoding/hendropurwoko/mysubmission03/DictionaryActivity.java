@@ -14,10 +14,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -78,8 +80,13 @@ public class DictionaryActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-                word = s.toString().trim();
-                new LoadDictionary().execute(word);
+
+                if (TextUtils.isEmpty(s.toString().trim())) {
+                    Toast.makeText(DictionaryActivity.this, "Tak ada pencarian", Toast.LENGTH_SHORT).show();
+                } else {
+                    word = s.toString().trim();
+                    new LoadDictionary().execute(s.toString().trim());
+                }
             }
         });
 
@@ -120,7 +127,7 @@ public class DictionaryActivity extends AppCompatActivity
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(getApplicationContext());
+            progressDialog = new ProgressDialog(DictionaryActivity.this);
             progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
             progressDialog.setCancelable(true);
             progressDialog.show();
