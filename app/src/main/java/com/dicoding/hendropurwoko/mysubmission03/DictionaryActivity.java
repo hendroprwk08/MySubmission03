@@ -13,11 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -35,8 +35,10 @@ public class DictionaryActivity extends AppCompatActivity
     public ArrayList<DictionaryModel> dictionaryModels = new ArrayList<>();
 
     EditText edtSearch;
+    NavigationView nView;
     String word;
     Boolean isEng;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +66,32 @@ public class DictionaryActivity extends AppCompatActivity
         rvList.setLayoutManager(new LinearLayoutManager(this));
         rvList.setAdapter(dictionaryAdapter);
 
-        isEng = true;
+        //defauit check navigation
+        nView = (NavigationView) findViewById(R.id.nav_view);
+        nView.getMenu().getItem(0).setChecked(true);
+
+        //isEng = true;
 
         edtSearch = (EditText) findViewById(R.id.edt_search);
+        edtSearch.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                word = edtSearch.getText().toString().trim();
+
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    if (TextUtils.isEmpty(word)) {
+                        dictionaryAdapter.clear();
+                        rvList.setAdapter(dictionaryAdapter);
+                        Toast.makeText(DictionaryActivity.this, "Tak ada pencarian", Toast.LENGTH_SHORT).show();
+                    } else {
+                        new LoadDictionary().execute(word);
+                    }
+                }
+                return true;
+            }
+        });
+        /*
         edtSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -90,6 +115,7 @@ public class DictionaryActivity extends AppCompatActivity
                 }
             }
         });
+        */
 
         /*
         // Ambil semua data mahasiswa di database
@@ -165,26 +191,19 @@ public class DictionaryActivity extends AppCompatActivity
         return false;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         displaySelectedScreen(item.getItemId());
         //make this method blank
+        if (item.getItemId() == R.id.nav_eng_ina) {
+            isEng = true;
+        }
+
+        if (item.getItemId() == R.id.nav_ina_eng) {
+            isEng = false;
+        }
+
         return true;
     }
 

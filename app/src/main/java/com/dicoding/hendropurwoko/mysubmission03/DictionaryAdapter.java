@@ -41,6 +41,11 @@ public class DictionaryAdapter extends RecyclerView.Adapter<DictionaryAdapter.Vi
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        this.dictionaryModels.clear();
+        notifyDataSetChanged();
+    }
+
     public ArrayList<DictionaryModel> getListData(){
         return dictionaryModels;
     }
