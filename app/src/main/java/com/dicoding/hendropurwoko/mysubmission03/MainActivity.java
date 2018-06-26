@@ -20,20 +20,10 @@ public class MainActivity extends AppCompatActivity{
     public ArrayList<DictionaryModel> dictionaryList;
     public ProgressDialog progressDialog;
 
-    Button btn;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        btn = (Button)findViewById(R.id.btn_open);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, DictionaryActivity.class));
-            }
-        });
 
         new LoadData().execute();
     }

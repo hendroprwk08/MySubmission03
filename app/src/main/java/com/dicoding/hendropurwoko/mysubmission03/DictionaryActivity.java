@@ -1,16 +1,14 @@
 package com.dicoding.hendropurwoko.mysubmission03;
 
-import android.content.Intent;
-import android.database.SQLException;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,16 +17,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 
 public class DictionaryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    Context context;
     RecyclerView rvList;
     DictionaryAdapter dictionaryAdapter;
     DictionaryHelper dictionaryHelper;
+
     public ArrayList<DictionaryModel> list = new ArrayList<>();
+
+    EditText edtSearch;
+    String word;
+    Boolean isEng;
+
+    public ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +47,6 @@ public class DictionaryActivity extends AppCompatActivity
 
         rvList = (RecyclerView) findViewById(R.id.rv_list);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
-                startActivity(new Intent(DictionaryActivity.this, SearchActivity.class));
-
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -60,41 +56,96 @@ public class DictionaryActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //load recyclerview
-        //set Adapter
+        //Set RecyclerView
         dictionaryAdapter = new DictionaryAdapter(this);
         rvList.setLayoutManager(new LinearLayoutManager(this));
         rvList.setAdapter(dictionaryAdapter);
-        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        isEng = true;
+
+        edtSearch = (EditText) findViewById(R.id.edt_search);
+        edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                word = edtSearch.getText().toString().trim();
+                dictionaryHelper = new DictionaryHelper(context);
+                dictionaryHelper.open();
+                ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.getWord(word,true);
+                dictionaryHelper.close();
+
+                dictionaryAdapter.addItem(dictionaryModels);
+                dictionaryAdapter.getListData();
+                rvList.setAdapter(dictionaryAdapter);
+
+            }
+        });
+
+        /*
         // Ambil semua data mahasiswa di database
         dictionaryHelper = new DictionaryHelper(this);
         dictionaryHelper.open();
         ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.query(true);
         dictionaryHelper.close();
 
-        /*
         //test
         DictionaryModel dictionaryModels = new DictionaryModel();
         dictionaryModels.setWord("SASDA");
         dictionaryModels.setDescription("DGDGDFGDGHDFHDFG");
         dictionaryModels.add(dictionaryModels);
-        */
 
         dictionaryAdapter.addItem(dictionaryModels);
         dictionaryAdapter.getListData();
-        //dictionaryAdapter.addItem(dictionaryModels);
-
-        //getRecyclerViewData("",true);
-        //dictionaryAdapter.getListData();
         rvList.setAdapter(dictionaryAdapter);
-
-        //getRecyclerViewData("",true);
-
-        //default fragment
-        //displaySelectedScreen(R.id.nav_eng_ina);
+        */
     }
 
+    /*
+    private class LoadDictionary extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            //new LoadDictionary(strings[0]).execute();
+
+            ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.getWord(strings[0],true);
+            dictionaryHelper.close();
+
+            dictionaryAdapter.addItem(dictionaryModels);
+            dictionaryAdapter.getListData();
+            rvList.setAdapter(dictionaryAdapter);
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
+            progressDialog.setCancelable(true);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+        }
+    }
+    */
+    /*
     private void getRecyclerViewData(String find, Boolean isEng) {
         dictionaryHelper = new DictionaryHelper(this);
         dictionaryHelper.open();
@@ -118,7 +169,7 @@ public class DictionaryActivity extends AppCompatActivity
         dictionaryHelper.close();
         dictionaryAdapter.addItem(list);
     }
-
+   */
 
     @Override
     public void onBackPressed() {
@@ -166,8 +217,10 @@ public class DictionaryActivity extends AppCompatActivity
         Fragment fragment = null;
 
         if (itemId == R.id.nav_eng_ina) {
+            isEng = true;
             //fragment = new EngInaFragment();
         } else if (itemId == R.id.nav_ina_eng) {
+            isEng = false;
             //fragment = new InaEngFragment();
         }
 

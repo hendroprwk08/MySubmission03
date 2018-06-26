@@ -58,6 +58,29 @@ public class DictionaryHelper {
         return dictionaryModels;
     }
 
+    public ArrayList<DictionaryModel> getWord(String search, boolean isEng) {
+        DictionaryModel dictionaryModel;
+
+        String TABLE = isEng ? ENGLISH : INDONESIA;
+        ArrayList<DictionaryModel> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE + " WHERE " + DatabaseHelper.FIELD_WORD + " LIKE '%" + search + "%'", null);
+
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                dictionaryModel = new DictionaryModel();
+                dictionaryModel.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.FIELD_ID)));
+                dictionaryModel.setWord(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.FIELD_WORD)));
+                dictionaryModel.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.FIELD_DESCRIPTION)));
+                arrayList.add(dictionaryModel);
+
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
     public void beginTransaction(){
         database.beginTransaction();
     }
