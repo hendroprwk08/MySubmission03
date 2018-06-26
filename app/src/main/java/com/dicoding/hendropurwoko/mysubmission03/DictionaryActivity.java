@@ -102,7 +102,6 @@ public class DictionaryActivity extends AppCompatActivity
     }
 
     private void displayRecyclerView() {
-
     }
 
     private class LoadDictionary extends AsyncTask<String, Void, ArrayList<DictionaryModel>> {
@@ -112,7 +111,7 @@ public class DictionaryActivity extends AppCompatActivity
         protected ArrayList<DictionaryModel> doInBackground(String... strings) {
             DictionaryHelper dictionaryHelper = new DictionaryHelper(context);
             dictionaryHelper.open();
-            ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.getWord(word, true);
+            ArrayList<DictionaryModel> dictionaryModels = dictionaryHelper.getWord(strings[0], true);
             dictionaryHelper.close();
 
             dictionaryAdapter.addItem(dictionaryModels);
@@ -125,18 +124,18 @@ public class DictionaryActivity extends AppCompatActivity
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(context);
+            /* progressDialog = new ProgressDialog(context);
             progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
             progressDialog.setCancelable(true);
-            progressDialog.show();
+            progressDialog.show();*/
         }
 
         @Override
         protected void onPostExecute(ArrayList<DictionaryModel> aVoid) {
             super.onPostExecute(aVoid);
 
-            if (progressDialog.isShowing())
-                progressDialog.dismiss();
+            /* if (progressDialog.isShowing())
+                progressDialog.dismiss(); */
 
             displayRecyclerView();
         }
